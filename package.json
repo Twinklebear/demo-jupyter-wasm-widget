@@ -1,0 +1,69 @@
+{
+  "name": "demo_jupyter_wasm_widget",
+  "version": "0.1.0",
+  "description": "A Custom Jupyter Widget",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension",
+    "widgets"
+  ],
+  "files": [
+    "dist/*.js",
+    "dist/*.wasm"
+  ],
+  "homepage": "https://github.com/Twinklebear/demo_jupyter_wasm_widget",
+  "license": "MIT",
+  "author": {
+    "name": "Will Usher",
+    "email": "will@willusher.io"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Twinklebear/demo_jupyter_wasm_widget"
+  },
+  "scripts": {
+    "build": "jlpm run build:lib && jlpm run build:webpack && jlpm run build:labextension:dev",
+    "build:prod": "jlpm run build:lib && jlpm run build:webpack && jlpm run build:labextension",
+    "build:lib": "tsc && cp ./ts/cpp/wgpu_app.wasm ./lib/cpp/",
+    "build:webpack": "webpack",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:labextension": "jupyter labextension build ."
+  },
+  "dependencies": {
+    "@jupyter-widgets/base": "^6.0.10"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.7",
+    "@babel/preset-env": "^7.23.8",
+    "@jupyter-widgets/base-manager": "^1.0.7",
+    "@jupyterlab/builder": "^4.0.11",
+    "@lumino/application": "^2.3.0",
+    "@lumino/widgets": "^2.3.1",
+    "@types/webpack-env": "^1.18.4",
+    "@webgpu/types": "^0.1.55",
+    "copy-webpack-plugin": "^12.0.2",
+    "rimraf": "^5.0.5",
+    "ts-loader": "^9.5.1",
+    "typescript": "~5.3.3",
+    "webpack": "^5.90.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "devDependenciesComments": {
+    "@jupyterlab/builder": "pinned to the latest JupyterLab 3.x release",
+    "@lumino/application": "pinned to the latest Lumino 1.x release",
+    "@lumino/widgets": "pinned to the latest Lumino 1.x release"
+  },
+  "jupyterlab": {
+    "extension": "lib/plugin",
+    "outputDir": "demo_jupyter_wasm_widget/labextension/",
+    "sharedPackages": {
+      "@jupyter-widgets/base": {
+        "bundled": false,
+        "singleton": true
+      }
+    }
+  }
+}

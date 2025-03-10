@@ -1,0 +1,5 @@
+{
+  "load_extensions": {
+    "demo_jupyter_wasm_widget/extension": true
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "allowJs": true,
+    "lib": ["ES6", "DOM"],
+    "module": "ES6",
+    "target": "ES6",
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
+    "outDir": "lib",
+    "resolveJsonModule": true,
+    "rootDir": "ts",
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["./node_modules/@webgpu/types", "./node_modules/@types"]
+  },
+  "include": ["ts/**/*.ts", "ts/**/*.js"]
+}
