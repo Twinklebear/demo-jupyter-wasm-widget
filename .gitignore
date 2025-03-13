@@ -153,6 +153,6 @@ $RECYCLE.BIN/
 # Packed lab extensions
 demo_jupyter_wasm_widget/labextension
 demo_jupyter_wasm_widget/nbextension
-*.vis3
+demo_jupyter_wasm_widget/static
 *.swp
 .yarn
