@@ -15,13 +15,11 @@
   "scripts": {
     "build": "esbuild ts/widget.ts --format=esm --bundle --outdir=demo_jupyter_wasm_widget/static && cp ./ts/cpp/wgpu_app.wasm ./demo_jupyter_wasm_widget/static/"
   },
-  "dependencies": {
-    "@jupyter-widgets/base": "^6.0.10"
-  },
   "devDependencies": {
     "@anywidget/types": "^0.2.0",
+    "@types/emscripten": "^1.40.0",
     "@webgpu/types": "^0.1.55",
     "esbuild": "^0.25.1",
-    "typescript": "~5.3.3"
+    "typescript": "^5.8.2"
   }
 }
