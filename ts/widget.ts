@@ -1,12 +1,12 @@
 /// <reference types="@webgpu/types" />
-import type { RenderProps } from "@anywidget/types";
+import type { AnyModel, RenderProps } from "@anywidget/types";
 import WGPUApp from "./cpp/wgpu_app";
 
 interface WasmWidgetModel {
   data: DataView;
-  _wasm: DataView;
 }
 
+let wasmBinary: ArrayBuffer;
 let next_canvas_id = 0;
 
 async function render({ model, el }: RenderProps<WasmWidgetModel>) {
@@ -54,8 +54,9 @@ async function render({ model, el }: RenderProps<WasmWidgetModel>) {
   const adapter = (await navigator.gpu.requestAdapter())!;
   const device = await adapter.requestDevice();
 
-  // @ts-expect-error - DataView.buffer is `ArrayBufferLike`, which is incompatible with `ArrayBuffer` but it's OK.
-  const wasmBinary: ArrayBuffer = model.get("_wasm").buffer;
+  if (wasmBinary === undefined) {
+    wasmBinary = await loadWasm(model);
+  }
 
   // We set -sINVOKE_RUN=0 when building and call main ourselves because something
   // within the promise -> call directly chain was gobbling exceptions
@@ -91,3 +92,32 @@ async function render({ model, el }: RenderProps<WasmWidgetModel>) {
 }
 
 export default { render };
+
+/**
+ * Loads wasm binary using a custom message (rather than traits).
+ *
+ * Traitlets are more simple but the data is always saved within the notebook.
+ * For large assets, this can make notebooks explode in size when widget state
+ * is saved.
+ *
+ * Ideally this function would grab the wasm from a URL as a fallback when/if
+ * a kernel is inactive.
+ *
+ */
+function loadWasm(model: AnyModel<WasmWidgetModel>): Promise<ArrayBuffer> {
+  let { promise, resolve, reject } = Promise.withResolvers<ArrayBuffer>();
+  let signal = AbortSignal.timeout(2000);
+  let handler = (msg: unknown, buffers: Array<DataView<ArrayBuffer>>) => {
+    console.log(msg)
+    if (msg === "load_wasm") {
+      resolve(buffers[0].buffer)
+      model.off("msg:custom", handler);
+    }
+  }
+  signal.addEventListener("abort", () => {
+    reject(new Error("Failed to load widget wasm."));
+  })
+  model.on("msg:custom", handler);
+  model.send("load_wasm");
+  return promise;
+}
