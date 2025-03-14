@@ -1,8 +1,9 @@
-import type { RenderProps } from "@anywidget/types";
+import type { AnyModel, RenderProps } from "@anywidget/types";
 import WGPUApp from "./cpp/wgpu_app";
 
 interface WasmWidgetModel {
   data: DataView;
+  _wasm: DataView;
 }
 
 let next_canvas_id = 0;
@@ -24,7 +25,6 @@ async function render({ model, el }: RenderProps<WasmWidgetModel>) {
   let app: Awaited<ReturnType<typeof WGPUApp>> | null = null;
   let loadGLTFBuffer: (ptr: number, size: number) => void | null = null;
 
-  /*
   const importGlb = () => {
     if (!loadGLTFBuffer) {
       console.warn("Wasm isn't ready to load GLTF data yet");
@@ -56,11 +56,18 @@ async function render({ model, el }: RenderProps<WasmWidgetModel>) {
   // We set -sINVOKE_RUN=0 when building and call main ourselves because something
   // within the promise -> call directly chain was gobbling exceptions
   // making it hard to debug
-  app = await WGPUApp({
+  app = await (<EmscriptenModuleFactory>WGPUApp)({
+    // @ts-expect-error - @types/emscripten missing file
     preinitializedWebGPUDevice: device,
-    locateFile: (filename: string) => {
-      return filename;
-    },
+    wasmBinary: model.get("_wasm").buffer,
+    // esmcripten tries to resolve a location for the wasm, regardless of
+    // whether `wasmBinary` is provided. It tries to create a URL with
+    // `new URL("foo.wasm", import.meta.url)` when no explicit `locateFile`,
+    // but `import.meta.url` doesn't exist for anywidget modules, so it throws.
+    //
+    // This is just to provide something explicit (to avoid the code path where
+    // emscripten tries to make a URL, but ultimately is ignored since we provide `wasmBinary`.
+    locateFile: () => "",
   });
 
   // We need to wait for the canvas element to be added before
@@ -74,7 +81,6 @@ async function render({ model, el }: RenderProps<WasmWidgetModel>) {
 
     loadGLTFBuffer = app.cwrap("load_gltf_buffer", null, ["number", "number"]);
   });
-  */
 }
 
 export default { render };
