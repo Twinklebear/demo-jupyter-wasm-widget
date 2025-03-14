@@ -4,18 +4,17 @@
     "esModuleInterop": true,
     "noImplicitAny": true,
     "allowJs": true,
-    "lib": ["ES6", "DOM"],
-    "module": "ES6",
-    "target": "ES6",
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "strict": true,
+    "module": "esnext",
+    "target": "esnext",
     "moduleResolution": "node",
-    "noEmitOnError": true,
-    "noUnusedLocals": true,
-    "outDir": "lib",
     "resolveJsonModule": true,
     "rootDir": "ts",
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
-    "typeRoots": ["./node_modules/@webgpu/types", "./node_modules/@types"]
+    "noEmit": true,
+    "types": ["@types/emscripten", "@webgpu/types"]
   },
   "include": ["ts/**/*.ts", "ts/**/*.js"]
 }
