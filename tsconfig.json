@@ -13,6 +13,7 @@
     "rootDir": "ts",
     "skipLibCheck": true,
     "allowSyntheticDefaultImports": true,
+    "noEmit": true,
     "types": ["@types/emscripten", "@webgpu/types"]
   },
   "include": ["ts/**/*.ts", "ts/**/*.js"]

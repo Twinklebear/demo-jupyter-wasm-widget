@@ -13,6 +13,7 @@
     "url": "https://github.com/Twinklebear/demo_jupyter_wasm_widget"
   },
   "scripts": {
+    "typecheck": "tsc",
     "build": "esbuild ts/widget.ts --format=esm --bundle --outdir=demo_jupyter_wasm_widget/static && cp ./ts/cpp/wgpu_app.wasm ./demo_jupyter_wasm_widget/static/"
   },
   "devDependencies": {

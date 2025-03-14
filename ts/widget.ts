@@ -1,4 +1,5 @@
-import type { AnyModel, RenderProps } from "@anywidget/types";
+/// <reference types="@webgpu/types" />
+import type { RenderProps } from "@anywidget/types";
 import WGPUApp from "./cpp/wgpu_app";
 
 interface WasmWidgetModel {
@@ -23,7 +24,7 @@ async function render({ model, el }: RenderProps<WasmWidgetModel>) {
   el.appendChild(canvas);
 
   let app: Awaited<ReturnType<typeof WGPUApp>> | null = null;
-  let loadGLTFBuffer: (ptr: number, size: number) => void | null = null;
+  let loadGLTFBuffer: ((ptr: number, size: number) => void) | null = null;
 
   const importGlb = () => {
     if (!loadGLTFBuffer) {
@@ -50,16 +51,18 @@ async function render({ model, el }: RenderProps<WasmWidgetModel>) {
   model.on("change:data", importGlb);
 
   // Get a GPU device to render with
-  const adapter = await navigator.gpu.requestAdapter();
+  const adapter = (await navigator.gpu.requestAdapter())!;
   const device = await adapter.requestDevice();
+
+  // @ts-expect-error - DataView.buffer is `ArrayBufferLike`, which is incompatible with `ArrayBuffer` but it's OK.
+  const wasmBinary: ArrayBuffer = model.get("_wasm").buffer;
 
   // We set -sINVOKE_RUN=0 when building and call main ourselves because something
   // within the promise -> call directly chain was gobbling exceptions
   // making it hard to debug
   app = await (<EmscriptenModuleFactory>WGPUApp)({
-    // @ts-expect-error - @types/emscripten missing file
+    // @ts-expect-error - Unknown typ
     preinitializedWebGPUDevice: device,
-    wasmBinary: model.get("_wasm").buffer,
     // esmcripten tries to resolve a location for the wasm, regardless of
     // whether `wasmBinary` is provided. It tries to create a URL with
     // `new URL("foo.wasm", import.meta.url)` when no explicit `locateFile`,
@@ -67,7 +70,10 @@ async function render({ model, el }: RenderProps<WasmWidgetModel>) {
     //
     // This is just to provide something explicit (to avoid the code path where
     // emscripten tries to make a URL, but ultimately is ignored since we provide `wasmBinary`.
-    locateFile: () => "",
+    locateFile: (filename: string) => {
+      return filename;
+    },
+    wasmBinary,
   });
 
   // We need to wait for the canvas element to be added before
@@ -76,6 +82,7 @@ async function render({ model, el }: RenderProps<WasmWidgetModel>) {
     try {
       app.callMain([`#${canvas.id}`]);
     } catch (e) {
+      // @ts-expect-error - Assume we have a wasm error
       console.error(e.stack);
     }
 
