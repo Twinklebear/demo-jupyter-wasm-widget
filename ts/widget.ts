@@ -106,7 +106,6 @@ export default { render };
  */
 function loadWasm(model: AnyModel<WasmWidgetModel>): Promise<ArrayBuffer> {
   let { promise, resolve, reject } = Promise.withResolvers<ArrayBuffer>();
-  let signal = AbortSignal.timeout(2000);
   let handler = (msg: unknown, buffers: Array<DataView<ArrayBuffer>>) => {
     console.log(msg)
     if (msg === "load_wasm") {
@@ -114,8 +113,8 @@ function loadWasm(model: AnyModel<WasmWidgetModel>): Promise<ArrayBuffer> {
       model.off("msg:custom", handler);
     }
   }
-  signal.addEventListener("abort", () => {
-    reject(new Error("Failed to load widget wasm."));
+  AbortSignal.timeout(2000).addEventListener("abort", () => {
+    reject(new Error("Loading widget WASM timed out."));
   })
   model.on("msg:custom", handler);
   model.send("load_wasm");
