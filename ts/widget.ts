@@ -107,7 +107,6 @@ export default { render };
 function loadWasm(model: AnyModel<WasmWidgetModel>): Promise<ArrayBuffer> {
   let { promise, resolve, reject } = Promise.withResolvers<ArrayBuffer>();
   let handler = (msg: unknown, buffers: Array<DataView<ArrayBuffer>>) => {
-    console.log(msg)
     if (msg === "load_wasm") {
       resolve(buffers[0].buffer)
       model.off("msg:custom", handler);
