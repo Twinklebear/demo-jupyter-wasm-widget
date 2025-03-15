@@ -6,6 +6,8 @@ a live demo running in [Google Colab](https://colab.research.google.com/drive/1h
 or download the repo, `pip install demo_jupyter_wasm_widget` and
 run the example in ./example/demo.ipynb.
 
+<img width="2558" alt="Screenshot 2025-03-15 at 3 45 36 PM" src="https://github.com/user-attachments/assets/d11af87b-df94-4d87-aab8-d79cdb66a03f" />
+
 # Dependencies
 
 The widget depends on `anywidget` and `traitlets`.
